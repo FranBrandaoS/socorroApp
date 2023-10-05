@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "socorro",
-    "slug": "socorro",
+    "name": "login-app",
+    "slug": "login-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

@@ -1,81 +1,67 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar'
+import { useEffect, useState } from 'react'
+import { StyleSheet, View } from 'react-native'
 
-const logoUrl = 'https://play-lh.googleusercontent.com/ahJtMe0vfOlAu1XJVQ6rcaGrQBgtrEZQefHy7SXB7jpijKhu1Kkox90XDuH8RmcBOXNn';
+import * as SecureStore from 'expo-secure-store'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const Login = () => {
-  const [usuario, setUsuario] = useState('');
-  const [senha, setSenha] = useState('');
-  const [statusLogin, setStatusLogin] = useState('');
+import { Text, Button, Input } from '@rneui/themed'
 
-  const realizarLogin = () => {
-    if (usuario === 'admin' && senha === '1234') {
-      setStatusLogin('Login realizado com sucesso');
-    } else {
-      setStatusLogin('Login falhou. Verifique suas credenciais.');
+export default function Login({navigation}) {
+  const [resultado, setResultado] = useState('Digite seus dados')
+  const [login, setLogin] = useState('')
+  const [senha, setSenha] = useState('')
+
+  const logar = () => {
+    if(login == '' && senha == ''){
+      setResultado('Digite login e senha!!!')
+      return
     }
-  };
+
+    if(login == 'admin' && senha == '1234'){
+      SecureStore.setItemAsync('token','123456')
+      AsyncStorage.setItem('user','Administrador')
+      
+      setResultado('Login com sucesso!')
+      navigation.navigate('Home')
+    } else {
+      setResultado('Login ou senha inválidos!')
+    }
+  }
+
+  useEffect(() => {
+    SecureStore.getItemAsync('token')
+    .then((token) => {
+      if(token != null){
+        navigation.navigate('Home')
+      }
+    })
+  },[])
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: logoUrl }} style={styles.logo} />
-      <Text style={[styles.titulo, { color: '#FFA500' }]}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Usuário"
-        onChangeText={(texto) => setUsuario(texto)}
-        value={usuario}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        onChangeText={(texto) => setSenha(texto)}
-        secureTextEntry={true}
-        value={senha}
-      />
-      <Button title="Entrar" onPress={realizarLogin} color="#6A5ACD" />
-      <Text style={styles.status}>{statusLogin}</Text>
+      <Text h1>Acesso ao APP</Text>
+      <Text>Login</Text>
+      <Input onChangeText={setLogin} />
+      <Text>Senha</Text>
+      <Input onChangeText={setSenha}
+      secureTextEntry={true} />
+      <Button size='md' radius={20} onPress={logar} title='Acessar' />
+      <Text style={styles.alert}>{resultado}</Text>
+      <StatusBar style="auto" />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
     alignItems: 'center',
-    backgroundColor: 'black',
-    padding: 16,
-    borderColor: 'white',
-    borderWidth: 1,
+    justifyContent: 'center',
   },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 16,
-  },
-  titulo: {
-    fontSize: 24,
+  alert: {
+    marginTop: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: 'white',
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderColor: 'white',
-    borderWidth: 1,
-    borderRadius: 4,
-    marginBottom: 16,
-    paddingLeft: 8,
-    color: 'white',
-  },
-  status: {
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-  },
+  }
 });
-
-export default Login;
